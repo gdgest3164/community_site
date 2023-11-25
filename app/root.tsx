@@ -1,13 +1,15 @@
 import "@mantine/core/styles.css";
-
+import "~/styles/global.css";
 import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction } from "@remix-run/node";
-import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
+import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLocation } from "@remix-run/react";
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
+import Header from "./components/Header";
 
 export const links: LinksFunction = () => [...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : [])];
 
 export default function App() {
+  const location = useLocation();
   return (
     <html lang="en">
       <head>
@@ -19,6 +21,7 @@ export default function App() {
       </head>
       <body>
         <MantineProvider>
+          {!location.pathname.includes("/auth") && <Header is_login={false} />}
           <Outlet />
           <ScrollRestoration />
           <Scripts />
