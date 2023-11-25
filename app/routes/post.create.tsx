@@ -1,7 +1,20 @@
 import { ActionIcon, Box, Button, Divider, Select, Space, TextInput, Title } from "@mantine/core";
+import { LoaderFunction, json } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
 import { IconChevronLeft } from "@tabler/icons-react";
+import { authenticate } from "~/auth.server";
 import PostUpload from "~/components/Post/Upload";
+import { TBoard, getBoards } from "~/models/board.service";
+
+interface ILoaderData {
+  boards: TBoard[];
+}
+
+export const loader: LoaderFunction = async ({ request }) => {
+  await authenticate(request);
+  const boards = await getBoards();
+  return json<ILoaderData>({ boards: boards.data as TBoard[] });
+};
 
 export default function PostCreate() {
   const boards = [

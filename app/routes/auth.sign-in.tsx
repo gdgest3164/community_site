@@ -1,20 +1,17 @@
 import { ActionIcon, Box, Button, Card, Divider, Group, Input, Space, Text } from "@mantine/core";
-import { ActionFunction, LoaderFunction, json, redirect } from "@remix-run/node";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { Form, Link, useNavigation } from "@remix-run/react";
-import { User } from "@supabase/supabase-js";
+import type { User } from "@supabase/supabase-js";
 import { IconChevronLeft } from "@tabler/icons-react";
 import QueryString from "qs";
 import { createUserSession, getUserToken } from "~/auth.server";
 import supabase from "~/models/supabase";
+import type { IActionData } from "./auth";
 
 interface InputData {
   email: string;
   password: string;
-}
-
-interface IActionData {
-  error: boolean;
-  message: any;
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -26,6 +23,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 export const action: ActionFunction = async ({ request }) => {
   const inputData = QueryString.parse(await request.text()) as unknown as InputData;
   const { data, error } = await supabase.auth.signInWithPassword(inputData);
+  console.log(data, error);
   if (error) {
     return json<IActionData>({
       error: true,
@@ -76,9 +74,10 @@ export default function SignIn() {
             variant="filled"
             placeholder="이메일"
             disabled={navigation.state === "submitting"} // UI 최적화
+            required
           />
           <Space h="sm" />
-          <Input name="password" type="password" variant="filled" placeholder="비밀번호" disabled={navigation.state === "submitting"} />
+          <Input name="password" type="password" variant="filled" placeholder="비밀번호" disabled={navigation.state === "submitting"} required />
           <Space h="sm" />
           <Button type="submit" fullWidth radius="md" loading={navigation.state === "submitting"}>
             로그인

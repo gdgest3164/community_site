@@ -1,4 +1,5 @@
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 import "~/styles/global.css";
 import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction } from "@remix-run/node";
@@ -22,8 +23,8 @@ export default function App() {
       </head>
       <body>
         <MantineProvider>
-          {!location.pathname.includes("/auth") && <Header is_login={false} />}
           <Notifications />
+          {!location.pathname.includes("/auth") && <Header is_login={false} />}
           <Outlet />
           <ScrollRestoration />
           <Scripts />

@@ -1,19 +1,16 @@
 import { Box, Button, Card, Divider, Input, Space, Text } from "@mantine/core";
-import { ActionFunction, json, redirect } from "@remix-run/node";
+import type { ActionFunction } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { Form, Link, useNavigation } from "@remix-run/react";
 import QueryString from "qs";
 import supabase from "~/models/supabase";
 import { createUser } from "~/models/user.service";
+import type { IActionData } from "./auth";
 
 interface InputData {
   name: string;
   email: string;
   password: string;
-}
-
-interface IActionData {
-  error: boolean;
-  message: any;
 }
 
 export const action: ActionFunction = async ({ request }) => {
