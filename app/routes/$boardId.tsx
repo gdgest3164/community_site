@@ -1,6 +1,6 @@
 import { Box, Space } from "@mantine/core";
 import SideBar from "~/components/SideBar";
-import PostId from "./$boardId.$postId";
+import { Outlet } from "@remix-run/react";
 
 export default function Index() {
   return (
@@ -10,7 +10,7 @@ export default function Index() {
       </Box>
       <Space w="xl" />
       <Box style={{ width: "100%" }}>
-        <PostId />
+        <Outlet />
       </Box>
     </Box>
   );
