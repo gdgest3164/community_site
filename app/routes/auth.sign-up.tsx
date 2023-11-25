@@ -1,5 +1,48 @@
 import { Box, Button, Card, Divider, Input, Space, Text } from "@mantine/core";
+import { ActionFunction, json, redirect } from "@remix-run/node";
 import { Form, Link, useNavigation } from "@remix-run/react";
+import QueryString from "qs";
+import supabase from "~/models/supabase";
+import { createUser } from "~/models/user.service";
+
+interface InputData {
+  name: string;
+  email: string;
+  password: string;
+}
+
+interface IActionData {
+  error: boolean;
+  message: any;
+}
+
+export const action: ActionFunction = async ({ request }) => {
+  const inputData = QueryString.parse(await request.text()) as unknown as InputData;
+
+  // data 에는 유저 정보가 담겨있음
+  const { data, error } = await supabase.auth.signUp({
+    ...inputData,
+    options: {
+      data: {
+        name: inputData.name,
+      },
+    },
+  });
+
+  if (error) {
+    return json<IActionData>({
+      error: true,
+      message: {
+        title: "회원가입 실패",
+        message: error.message,
+        color: "red",
+      },
+    });
+  }
+
+  await createUser(data.user?.id as string, inputData.name);
+  return redirect("/quth/sign-in");
+};
 
 export default function SignUp() {
   const navigation = useNavigation();

@@ -5,6 +5,7 @@ import type { LinksFunction } from "@remix-run/node";
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLocation } from "@remix-run/react";
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import Header from "./components/Header";
+import { Notifications } from "@mantine/notifications";
 
 export const links: LinksFunction = () => [...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : [])];
 
@@ -22,6 +23,7 @@ export default function App() {
       <body>
         <MantineProvider>
           {!location.pathname.includes("/auth") && <Header is_login={false} />}
+          <Notifications />
           <Outlet />
           <ScrollRestoration />
           <Scripts />

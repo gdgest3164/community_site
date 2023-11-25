@@ -5,7 +5,7 @@ import PointSelect from "~/components/Point/Select";
 
 export default function Shop() {
   //   const { user, point } = useLoaderData<ILoaderData>();
-  const clientKey = "test_ck_Z1aOwX7K8mX7WY41GxDqryQxzvNP";
+  const clientKey = process.env.TOSS_CLIENT_KEY as string;
   const [selected, setSelected] = useState(2000);
   return (
     <Box
