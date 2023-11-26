@@ -2,6 +2,7 @@ import { ActionIcon, Box, Button, Menu, Modal, Space, Text, Textarea } from "@ma
 import { useFetcher } from "@remix-run/react";
 import { IconDotsVertical, IconPencil, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
+import { InputType } from "~/routes/$boardId.$postId._index";
 
 interface ICommentItem {
   comment: any;
@@ -43,20 +44,22 @@ export default function CommentItem({ comment, is_owner }: ICommentItem) {
               </Menu>
 
               <Modal opened={deleteModalOpened} onClose={() => setDeleteModalOpened(false)} title="글 삭제">
-                <Text style={{ align: "center" }}>정말 글을 삭제하시겠습니까?</Text>
+                <Text style={{ align: "center" }}>정말로 댓글을 삭제하시겠습니까?</Text>
                 <Space h="lg" />
                 <Space h="lg" />
-                <Box style={{ display: "flex", justifyContent: "center" }}>
-                  <Button variant="default" onClick={() => setDeleteModalOpened(false)}>
-                    취소
-                  </Button>
-                  <Space w="md" />
-                  <fetcher.Form method="post">
-                    <Button color="red" type="submit" name="action" value={0}>
+                <fetcher.Form method="post" onSubmit={() => setDeleteModalOpened(false)}>
+                  <input type="hidden" name="commentId" value={comment.id} />
+                  <Space h="lg" />
+                  <Box style={{ display: "flex", justifyContent: "center" }}>
+                    <Button variant="default" onClick={() => setDeleteModalOpened(false)}>
+                      취소
+                    </Button>
+                    <Space w="md" />
+                    <Button color="red" type="submit" name="action" value={InputType.DELETE_COMMENT}>
                       삭제
                     </Button>
-                  </fetcher.Form>
-                </Box>
+                  </Box>
+                </fetcher.Form>
               </Modal>
             </Box>
           )}
@@ -80,7 +83,7 @@ export default function CommentItem({ comment, is_owner }: ICommentItem) {
                   취소
                 </Button>
                 <Space w="xs" />
-                <Button color="red" type="submit" name="action">
+                <Button color="red" type="submit" name="action" value={InputType.UPDATE_COMMENT}>
                   수정하기
                 </Button>
               </Box>

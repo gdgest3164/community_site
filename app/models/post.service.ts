@@ -20,7 +20,7 @@ export type TPost = {
 
 //게시글 최신순으로 모두 불러오기
 export async function getPosts() {
-  return await supabase.from("post").select("*").order("created_at", { ascending: false });
+  return await supabase.from("post").select("*, board(path)").order("created_at", { ascending: false });
 }
 
 //특정 게시판의 게시글을 최신순으로 정렬하여 불러오기
@@ -30,7 +30,7 @@ export async function getPostByBoardId(board_id: number) {
 
 //게시글 id를 통해 댓글을 최신순으로 정렬하면서 게시글 불러오기
 export async function getPostById(id: number) {
-  return await supabase.from("post").select("*, writer(name, user_id), comment(*, writer(name, user_id)").order("created_at", { foreignTable: "comment", ascending: false }).eq("id", id).single();
+  return await supabase.from("post").select("*, writer(name, user_id), comment(*, writer(name, user_id))").order("created_at", { foreignTable: "comment", ascending: false }).eq("id", id).single();
 }
 
 //미리 정의해둔 post_view_increment 함수를 RPC로 실행

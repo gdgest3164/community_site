@@ -13,7 +13,7 @@ export type TComment = {
 
 // 댓글 id 를 통해 댓글 불러오기
 export async function getCommentById(id: number) {
-  return await supabase.from("comment").select(`*`).eq("id", id).single();
+  return await supabase.from("comment").select(`*, writer(name, user_id)`).eq("id", id).single();
 }
 
 // 댓글 생성하기

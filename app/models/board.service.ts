@@ -13,6 +13,6 @@ export async function getBoards() {
 }
 
 //특정 path를 가진 게시판 가져오기
-export async function getBoradByPath(pah: string) {
-  return await supabase.from("boadr").select("*").eq("path", "path").single();
+export async function getBoradByPath(path: string) {
+  return await supabase.from("board").select("*").eq("path", path).single();
 }

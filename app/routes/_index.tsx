@@ -1,24 +1,35 @@
 import { Box, Space } from "@mantine/core";
+import type { LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import PostItem from "~/components/Post/Item";
 import SideBar from "~/components/SideBar";
+import { getBoards, type TBoard } from "~/models/board.service";
+import { getPosts, type TPost } from "~/models/post.service";
+
+interface ILoaderData {
+  boards: TBoard[] | [];
+  posts: TPost[] | [];
+}
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const boards = await getBoards();
+  const recentPost = await getPosts();
+  return json<ILoaderData>({
+    boards: boards.data as TBoard[],
+    posts: recentPost.data as TPost[],
+  });
+};
 
 export default function Index() {
+  const { boards, posts } = useLoaderData<ILoaderData>();
   return (
     <Box style={{ display: "flex", padding: "0 50px", paddingTop: "50px", width: "calc(100% -100px)", maxWidth: "1100px", margin: "0 auto" }}>
       <Box>
-        <SideBar boards={[{ path: "/notice", name: "공지사항" }]} />
+        <SideBar boards={boards ?? []} />
       </Box>
       <Space w="xl" />
-      <Box style={{ width: "100%" }}>
-        {(
-          [
-            { id: 1, title: "제목1", writer: { name: "김동한" }, created_at: "2023-11-25", view: 1, board: { name: "공지사항", path: "notice" } },
-            { id: 2, title: "제목2", writer: { name: "김동한2" }, created_at: "2023-11-25", view: 1, board: { name: "공지사항", path: "notice" } },
-          ] as any
-        ).map((post: any) => (
-          <PostItem key={post.id} post={post} path={post.board.path} />
-        ))}
-      </Box>
+      <Box style={{ width: "100%" }}>{posts ? posts.map((post: any) => <PostItem key={post.id} post={post} path={post.board.path} />) : null}</Box>
     </Box>
   );
 }

@@ -12,7 +12,7 @@ export default function PostItem({ post, path }: IPostItem) {
         <Box style={{ width: "100%", display: "flex", alignContent: "center", justifyContent: "space-between" }}>
           <Box style={{ display: "flex", alignItems: "center" }}>
             <Badge color="blue" mr="md">
-              {post.board.name}
+              {path}
             </Badge>
             <Text>{post.title}</Text>
           </Box>
