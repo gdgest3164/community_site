@@ -1,51 +1,8 @@
-import { showNotification } from "@mantine/notifications";
 import type { IActionData } from "./auth";
 import { ActionIcon, Box, Button, Card, Divider, Group, Input, Space, Text } from "@mantine/core";
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useNavigation } from "@remix-run/react";
-import type { User } from "@supabase/supabase-js";
 import { IconChevronLeft } from "@tabler/icons-react";
-import QueryString from "qs";
-import { useEffect, useState } from "react";
-import { createUserSession, getUserToken } from "~/auth.server";
-import supabase from "~/models/supabase";
-
-interface InputData {
-  email: string;
-  password: string;
-}
-
-export const loader: LoaderFunction = async ({ request }) => {
-  const { accessToken } = await getUserToken(request);
-  if (accessToken) return redirect("/");
-  return {};
-};
-
-export const action: ActionFunction = async ({ request }) => {
-  const inputData = QueryString.parse(await request.text()) as unknown as InputData;
-  const { data, error } = await supabase.auth.signInWithPassword(inputData);
-
-  if (error) {
-    return json<IActionData>({
-      error: true,
-      message: {
-        title: "로그인 실패",
-        message: error.message,
-        color: "red",
-      },
-    });
-  }
-
-  return await createUserSession({
-    request,
-    access_token: data.session?.access_token as string,
-    refresh_token: data.session?.refresh_token as string,
-    expires_at: data.session?.expires_at as number,
-    user: data.user as User,
-    redirectTo: "/",
-  });
-};
+import { useState } from "react";
 
 export default function SignIn() {
   const navigation = useNavigation();

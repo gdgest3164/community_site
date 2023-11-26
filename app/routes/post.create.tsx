@@ -1,13 +1,30 @@
 import { ActionIcon, Box, Button, Divider, Select, Space, TextInput, Title } from "@mantine/core";
-import { LoaderFunction, json } from "@remix-run/node";
-import { Form, Link } from "@remix-run/react";
+import { showNotification } from "@mantine/notifications";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
+import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import { IconChevronLeft } from "@tabler/icons-react";
-import { authenticate } from "~/auth.server";
+import QueryString from "qs";
+import { useEffect, useState } from "react";
+import { authenticate, getUser } from "~/auth.server";
 import PostUpload from "~/components/Post/Upload";
-import { TBoard, getBoards } from "~/models/board.service";
+import type { TBoard } from "~/models/board.service";
+import { getBoards } from "~/models/board.service";
+import { createPost } from "~/models/post.service";
 
 interface ILoaderData {
   boards: TBoard[];
+}
+
+interface InputData {
+  title: string;
+  content: string;
+  board_id: number;
+}
+
+interface IActionData {
+  error: boolean;
+  message: TMessage;
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -16,11 +33,48 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json<ILoaderData>({ boards: boards.data as TBoard[] });
 };
 
+export const action: ActionFunction = async ({ request }) => {
+  const { headers } = await authenticate(request);
+  const user = await getUser(request);
+  const data = QueryString.parse(await request.text()) as unknown as InputData;
+
+  if (data.board_id && data.title && data.content) {
+    await createPost(data.title, data.content, data.board_id, user.user.id);
+    return redirect(`/`, {
+      headers,
+    });
+  }
+
+  return json<IActionData>({
+    error: true,
+    message: {
+      title: "글 작성 실패",
+      message: "제목과 내용을 모두 입력해주세요.",
+      color: "red",
+    },
+  });
+};
+
 export default function PostCreate() {
-  const boards = [
-    { id: "1", name: "공지사항" },
-    { id: "2", name: "자유게시판" },
-  ];
+  const { boards } = useLoaderData<ILoaderData>();
+  const actionData = useActionData<IActionData>();
+  const [message, setMessage] = useState<IActionData>();
+
+  useEffect(() => {
+    if (actionData) {
+      setMessage(actionData);
+    }
+  }, [actionData]);
+
+  useEffect(() => {
+    if (message) {
+      showNotification({
+        title: message.message.title,
+        message: message.message.message,
+        color: message.message.color,
+      });
+    }
+  }, [message]);
   return (
     <Box style={{ padding: "0 50px", paddingTop: "50px", width: "calc(100% - 100px)", maxWidth: "1100px", margin: "0 auto" }}>
       <Box style={{ display: "flex", alignItems: "center" }}>

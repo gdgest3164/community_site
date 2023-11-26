@@ -1,11 +1,13 @@
+import type { IActionData } from "./auth";
 import { Box, Button, Card, Divider, Input, Space, Text } from "@mantine/core";
+import { showNotification } from "@mantine/notifications";
 import type { ActionFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, Link, useNavigation } from "@remix-run/react";
+import { Form, Link, useActionData, useNavigation } from "@remix-run/react";
 import QueryString from "qs";
+import { useEffect, useState } from "react";
 import supabase from "~/models/supabase";
 import { createUser } from "~/models/user.service";
-import type { IActionData } from "./auth";
 
 interface InputData {
   name: string;
@@ -25,7 +27,6 @@ export const action: ActionFunction = async ({ request }) => {
       },
     },
   });
-
   if (error) {
     return json<IActionData>({
       error: true,
@@ -43,6 +44,24 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function SignUp() {
   const navigation = useNavigation();
+  const actionData = useActionData<IActionData>();
+  const [message, setMessage] = useState<IActionData>();
+
+  useEffect(() => {
+    if (actionData) {
+      setMessage(actionData);
+    }
+  }, [actionData]);
+
+  useEffect(() => {
+    if (message) {
+      showNotification({
+        title: message.message.title,
+        message: message.message.message,
+        color: message.message.color,
+      });
+    }
+  }, [message]);
   return (
     <Box
       style={{
